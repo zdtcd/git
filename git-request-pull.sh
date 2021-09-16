@@ -116,15 +116,17 @@ set fnord $(git ls-remote "$url" | @@PERL@@ -e "$find_matching_ref" "${remote:-H
 remote_sha1=$2
 ref=$3
 
+remote_or_head=${remote:-HEAD}
+
 if test -z "$ref"
 then
 	echo "warn: No match for commit $headrev found at $url" >&2
-	echo "warn: Are you sure you pushed '${remote:-HEAD}' there?" >&2
+	echo "warn: Are you sure you pushed '$remote_or_head' there?" >&2
 	status=1
 elif test "$local_sha1" != "$remote_sha1"
 then
 	echo "warn: $head found at $url but points to a different object" >&2
-	echo "warn: Are you sure you pushed '${remote:-HEAD}' there?" >&2
+	echo "warn: Are you sure you pushed '$remote_or_head' there?" >&2
 	status=1
 fi
 
