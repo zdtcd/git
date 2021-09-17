@@ -56,6 +56,22 @@ pretty_remote=${pretty_remote#heads/}
 head=$(git symbolic-ref -q "$local")
 head=${head:-$(git show-ref --heads --tags "$local" | cut -d' ' -f2)}
 head=${head:-$(git rev-parse --quiet --verify "$local")}
+l10n=$(git config --bool-or-str requestpull.l10n)
+
+case "$l10n" in
+true)
+	l10n_lang=${LANG:-C}
+	l10n_lc=${LC_ALL:-C}
+	;;
+false)
+	l10n_lang=C
+	l10n_lc=C
+	;;
+*)
+	l10n_lang=$l10n
+	l10n_lc=$l10n
+	;;
+esac
 
 # None of the above? Bad.
 test -z "$head" && die "$(eval_gettext "fatal: Not a valid revision: \$local")"
@@ -139,7 +155,7 @@ fi
 url=$(git ls-remote --get-url "$url")
 
 git show -s --format="
-$(gettext 'The following changes since commit %H:
+$(LANG=$l10n_lang LC_ALL=$l10n_lc gettext 'The following changes since commit %H:
 
   %s (%ci)
 
@@ -148,7 +164,7 @@ are available in the Git repository at:
 " $merge_base &&
 echo "  $url $pretty_remote" &&
 git show -s --format="
-$(gettext '
+$(LANG=$l10n_lang LC_ALL=$l10n_lc gettext '
 for you to fetch changes up to %H:
 
   %s (%ci)
@@ -165,7 +181,7 @@ fi &&
 
 if test -n "$branch_name"
 then
-	echo "$(eval_gettext "(from the branch description for \$branch_name local branch)")"
+	echo "$(LANG=$l10n_lang LC_ALL=$l10n_lc eval_gettext "(from the branch description for \$branch_name local branch)")"
 	echo
 	git config "branch.$branch_name.description"
 	echo "----------------------------------------------------------------"
