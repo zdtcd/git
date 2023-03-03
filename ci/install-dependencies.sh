@@ -6,16 +6,12 @@
 . ${0%/*}/lib.sh
 
 P4WHENCE=https://cdist2.perforce.com/perforce/r21.2
-LFSWHENCE=https://github.com/github/git-lfs/releases/download/v$LINUX_GIT_LFS_VERSION
+LFSWHENCE=https://github.com/github/git-lfs/releases/download
 UBUNTU_COMMON_PKGS="make libssl-dev libcurl4-openssl-dev libexpat-dev
  tcl tk gettext zlib1g-dev perl-modules liberror-perl libauthen-sasl-perl
  libemail-valid-perl libio-socket-ssl-perl libnet-smtp-ssl-perl"
 
-case "$runs_on_pool" in
-ubuntu-*)
-	sudo apt-get -q update
-	sudo apt-get -q -y install language-pack-is libsvn-perl apache2 \
-		$UBUNTU_COMMON_PKGS $CC_PACKAGE $PYTHON_PACKAGE
+_install_linux_p4() {
 	mkdir --parents "$P4_PATH"
 	pushd "$P4_PATH"
 		wget --quiet "$P4WHENCE/bin.linux26x86_64/p4d"
@@ -23,12 +19,36 @@ ubuntu-*)
 		chmod u+x p4d
 		chmod u+x p4
 	popd
+}
+
+_install_linux_git_lfs() {
+	local whence fname
+	whence="$1"
+	fname="$2"
 	mkdir --parents "$GIT_LFS_PATH"
 	pushd "$GIT_LFS_PATH"
-		wget --quiet "$LFSWHENCE/git-lfs-linux-amd64-$LINUX_GIT_LFS_VERSION.tar.gz"
-		tar --extract --gunzip --file "git-lfs-linux-amd64-$LINUX_GIT_LFS_VERSION.tar.gz"
-		cp git-lfs-$LINUX_GIT_LFS_VERSION/git-lfs .
+		wget --quiet "$whence/$fname"
+		tar --extract --gunzip --strip-components=1 --file "$fname"
 	popd
+}
+
+case "$runs_on_pool" in
+ubuntu-*)
+	sudo apt-get -q update
+	sudo apt-get -q -y install language-pack-is libsvn-perl apache2 \
+		$UBUNTU_COMMON_PKGS $CC_PACKAGE $PYTHON_PACKAGE
+
+	case "$(uname -m)" in
+	x86_64)
+		_install_linux_p4
+		_install_linux_git_lfs "$LFSWHENCE/v${LINUX_GIT_LFS_VERSION}" \
+			"git-lfs-linux-amd64-$LINUX_GIT_LFS_VERSION.tar.gz"
+		;;
+	*)
+		echo "Not supported architecture" >&2
+		exit 1
+		;;
+	esac
 	;;
 macos-*)
 	export HOMEBREW_NO_AUTO_UPDATE=1 HOMEBREW_NO_INSTALL_CLEANUP=1
