@@ -201,6 +201,22 @@ then
 	MAKEFLAGS="$MAKEFLAGS --jobs=10"
 	test windows != "$CI_OS_NAME" ||
 	GIT_TEST_OPTS="--no-chain-lint --no-bin-wrappers $GIT_TEST_OPTS"
+elif test "$CIRCLECI" = true
+then
+	CI_TYPE=circleci
+	CI_BRANCH="$CIRCLE_BRANCH"
+	CI_COMMIT="$CIRCLE_SHA1"
+	CI_JOB_ID="$CIRCLE_WORKFLOW_JOB_ID"
+	CI_JOB_NUMBER="$CIRCLE_BUILD_NUM"
+	CI_OS_NAME="$(uname -s) $(uname -m)"
+	CI_REPO_SLUG="$(expr "$CIRCLE_REPOSITORY_URL" : '.*:\([^/]*/[^/]*\)\.git$')"
+	CC="${CC:-gcc}"
+
+	cache_dir="$HOME/none"
+
+	export GIT_PROVE_OPTS="--timer --jobs 10"
+	export GIT_TEST_OPTS="--verbose-log -x --write-junit-xml"
+	MAKEFLAGS="$MAKEFLAGS --jobs=10"
 else
 	echo "Could not identify CI type" >&2
 	env >&2

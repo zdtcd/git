@@ -1,0 +1,17 @@
+# .circleci/config.yml
+jobs:
+  build:
+    machine:
+      image: ubuntu-2004:2022.04.1
+    resource_class: arm.medium
+    environment:
+      jobname: linux-gcc
+      runs_on_pool: ubuntu-arm64
+    steps:
+    - checkout
+    - run: ci/install-dependencies.sh
+    - run:
+        name: Build and Tests
+        command: ci/run-build-and-tests.sh
+    - store_test_results:
+        path: t/out
