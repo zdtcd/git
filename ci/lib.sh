@@ -227,11 +227,6 @@ export SKIP_DASHED_BUILT_INS=YesPlease
 
 case "$runs_on_pool" in
 ubuntu-*)
-	if test "$jobname" = "linux-gcc-default"
-	then
-		break
-	fi
-
 	PYTHON_PACKAGE=python2
 	if test "$jobname" = linux-gcc
 	then
