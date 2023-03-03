@@ -44,6 +44,10 @@ ubuntu-*)
 		_install_linux_git_lfs "$LFSWHENCE/v${LINUX_GIT_LFS_VERSION}" \
 			"git-lfs-linux-amd64-$LINUX_GIT_LFS_VERSION.tar.gz"
 		;;
+	aarch64)
+		_install_linux_git_lfs "$LFSWHENCE/v${LINUX_GIT_LFS_VERSION}" \
+			"git-lfs-linux-arm64-v$LINUX_GIT_LFS_VERSION.tar.gz"
+		;;
 	*)
 		echo "Not supported architecture" >&2
 		exit 1

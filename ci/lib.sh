@@ -242,6 +242,12 @@ ubuntu-*)
 	# image.
 	# Keep that in mind when you encounter a broken OS X build!
 	export LINUX_GIT_LFS_VERSION="1.5.2"
+	# The Linux arm64 build installs yet another recent version, since
+	# above version doesn't ship prebuilt binaries for arm64.
+	if test "$(uname -m)" = aarch64
+	then
+		LINUX_GIT_LFS_VERSION="3.3.0"
+	fi
 
 	P4_PATH="$HOME/custom/p4"
 	GIT_LFS_PATH="$HOME/custom/git-lfs"
